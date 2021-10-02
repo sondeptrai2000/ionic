@@ -1,0 +1,7 @@
+{
+  "name": "moblie",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
