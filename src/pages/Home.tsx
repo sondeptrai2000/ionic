@@ -31,34 +31,40 @@ import { start } from "repl";
 
 const Home: React.FC = () => {
   const [property, setProperty] = useState("");
-  const [bedrooms, setBedrooms] = useState<number>();
-  const [monthlyRent, setMonthlyRent] = useState<number>();
+  const [bedrooms, setBedrooms] = useState("");
+  const [monthlyRent, setMonthlyRent] = useState("");
   const [furniture, setFurniture] = useState("");
   const [notes, setNotes] = useState("");
   const [reporter, setReporter] = useState("");
   const [present, dismiss] = useIonToast();
+  const [check, setCheck] = useState(false);
+
+  // function checkBedRoom(){
+  //   if(bedrooms) return true;
+  //   if(!bedrooms) return false;
+  // }
+
+  function handleVibration() {
+    //vibrating for 2 seconds
+    navigator.vibrate(2000);
+    console.log("vibration for 2 seconds");
+  }
 
   function saveToDb() {
-    if (
-      property == "" ||
-      !bedrooms ||
-      !monthlyRent ||
-      furniture == "" ||
-      notes == "" ||
-      notes == "" ||
-      reporter == ""
-    )
-      return alert("hãy nhập hết tất cả thông tin cần thiết");
-    var propertyỌbj = {
+    setCheck(true);
+    if ( property == "" || !bedrooms || !monthlyRent ||reporter == "") return alert("hãy nhập hết tất cả thông tin cần thiết");
+    var propertyObj = {
       property: property,
-      bedrooms: bedrooms,
-      monthlyRent: monthlyRent,
+      bedrooms: parseInt(bedrooms),
+      monthlyRent: parseInt(monthlyRent),
       furniture: furniture,
       notes: notes,
       reporter: reporter,
       time: new Date().toLocaleDateString("vi-VN"),
     };
-    insertProperty(propertyỌbj).then(() => {
+    let action = window.confirm("Are you sure that input information is corrected ?");
+    if (!action) return alert("You don't save this property!");
+    insertProperty(propertyObj).then(() => {
       present("Insert customer successfully!", 3000);
     });
   }
@@ -84,6 +90,7 @@ const Home: React.FC = () => {
             <IonSelectOption value="House">House</IonSelectOption>
             <IonSelectOption value="Bungalow">Bungalow</IonSelectOption>
           </IonSelect>
+          {check && property.length == 0 && <p>Property type is required!</p>}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">
@@ -92,8 +99,9 @@ const Home: React.FC = () => {
           <IonInput
             type="number"
             placeholder="Enter Number of bedrooms"
-            onIonChange={(e) => setBedrooms(parseInt(e.detail.value!, 10))}
+            onIonChange={(e) => setBedrooms(e.detail.value!)}
           ></IonInput>
+          {check && !bedrooms && <p>Number of bedroom is required!</p>}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">
@@ -102,8 +110,9 @@ const Home: React.FC = () => {
           <IonInput
             type="number"
             placeholder="Enter monthly rent price"
-            onIonChange={(e) => setMonthlyRent(parseInt(e.detail.value!, 10))}
+            onIonChange={(e) => setMonthlyRent(e.detail.value!)}
           ></IonInput>
+          {check && !monthlyRent && <p>Monthly rent is required!</p>}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Furniture types:</IonLabel>
@@ -133,6 +142,9 @@ const Home: React.FC = () => {
             type="text"
             onIonChange={(event) => setReporter(event.detail.value!)}
           ></IonInput>
+          {check && reporter.length == 0 && 
+            <p>Name of reporter is required!</p>
+          }
         </IonItem>
         <IonButton onClick={saveToDb} expand="block" color="tertiary">
           <IonLabel>Save</IonLabel>

@@ -23,9 +23,8 @@ import { Property } from "../models";
 const AllProperty: React.FC = () => {
   //list of customers-> will be used in the List component
   const [propertys, setPropertys] = useState<Property[]>([]);
-  const [searchText, setSearchText] = useState("");
+  const [searchProperty, setSearchProperty] = useState("");
   const [furnitureFilter, setFurnitureFilter] = useState("");
-
   async function fetchData() {
     let allCustomers = await getAllPropertys();
     setPropertys(allCustomers);
@@ -51,11 +50,11 @@ const AllProperty: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonSearchbar
-            value={searchText}
-            onIonChange={(e) => setSearchText(e.detail.value!)}
-            animated
-          ></IonSearchbar>
+        <IonSelect placeholder='Property type' onIonChange={(e) => setSearchProperty(e.detail.value)}>
+            <IonSelectOption value="Flat">Flat</IonSelectOption>
+            <IonSelectOption value="House">House</IonSelectOption>
+            <IonSelectOption value="Bungalow">Bungalow</IonSelectOption>
+          </IonSelect>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -77,7 +76,6 @@ const AllProperty: React.FC = () => {
         )}
       </IonContent>
       <IonFooter>
-        <IonToolbar>Search Text: {searchText ?? "(none)"}</IonToolbar>
       </IonFooter>
     </IonPage>
   );

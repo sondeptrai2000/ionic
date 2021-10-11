@@ -8,23 +8,14 @@ initDB().then(()=>{
     console.log("Init database done! ",DATABASE_NAME)
 })
 
+
+
+
 export async function updateProperty(property:Property) {
     //find in the database with the id
     const db = await openDB(DATABASE_NAME, 1);
     const tx = db.transaction('propertys', 'readwrite');
-    const store = tx.objectStore('propertys');
-    var updateProperty = await store.get(property.id!) as Property
-    //update the found record with new values
-    updateProperty.property  = property.property
-    updateProperty.bedrooms = property.bedrooms
-    updateProperty.monthlyRent =property.monthlyRent
-    updateProperty.furniture = property.furniture
-    updateProperty.notes = property.notes
-    updateProperty.reporter = property.reporter
-    updateProperty.time = property.time
-    console.log(updateProperty)
-    //really do the update: from memory ->database
-    await db.put("propertys",updateProperty);
+    await db.put("propertys",property);
     await tx.done;
 }
 
@@ -36,22 +27,13 @@ export async function deleteProperty(id:number) {
 export async function getProperty(id:number) {
     const db = await openDB(DATABASE_NAME, 1);
     const property = await db.get('propertys',id)
-    console.log("i am getting the property "+ property)
     return property;
 }
 
 export async function getAllPropertys() {
     const db = await openDB(DATABASE_NAME, 1);
-    var cursor = await db.transaction("propertys").objectStore("propertys").
-         
-    openCursor();
-    var propertys = []; //init an empty array
-    //while there are propertys left
-    while (cursor) {
-        propertys.push(cursor.value); //add the new property to the result
-        cursor = await cursor.continue(); //move to the next property
-    }
-    return propertys;
+    var cursor = await db.getAll("propertys")
+    return cursor;
 }
 
 export async function  insertProperty(property:Property){
