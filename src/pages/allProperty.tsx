@@ -27,8 +27,8 @@ const AllProperty: React.FC = () => {
   async function fetchData() {
     let allCustomers = await getAllPropertys();
     if (searchProperty != "All" && searchProperty) {
-      //lọc ra những phần tử có property trùng với loại đang lọc
-      allCustomers = allCustomers.filter(element => element.property == searchProperty)
+      //lọc ra những phần tử có property và bed lớn hơn 2 trùng với loại đang lọc
+      allCustomers = allCustomers.filter((element) => element.property == searchProperty && element.bedrooms > 2);
     }
     setPropertysFilter(allCustomers);
   }
