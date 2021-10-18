@@ -37,7 +37,6 @@ import { addCircle, call, listCircleSharp, person } from "ionicons/icons";
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/home">
             <Home />
@@ -52,17 +51,6 @@ const App: React.FC = () => (
             <Redirect to="/allProperty" />
           </Route>
         </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="allProperty" href="/allProperty">
-            <IonIcon icon={listCircleSharp} />
-            <IonLabel>Properties</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="home" href="/home">
-            <IonIcon icon={addCircle} />
-            <IonLabel>Add property</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
     </IonReactRouter>
   </IonApp>
 );

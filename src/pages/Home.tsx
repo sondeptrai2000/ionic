@@ -1,5 +1,7 @@
 import {
+  IonBackButton,
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -51,8 +53,8 @@ const Home: React.FC = () => {
   }
 
   function saveToDb() {
-    setCheck(true);
-    if ( property == "" || !bedrooms || !monthlyRent ||reporter == "") return alert("hãy nhập hết tất cả thông tin cần thiết");
+    if (property == "" || !bedrooms || !monthlyRent || reporter == "")
+      return setCheck(true);
     var propertyObj = {
       property: property,
       bedrooms: parseInt(bedrooms),
@@ -62,7 +64,9 @@ const Home: React.FC = () => {
       reporter: reporter,
       time: new Date().toLocaleDateString("vi-VN"),
     };
-    let action = window.confirm("Are you sure that input information is corrected ?");
+    let action = window.confirm(
+      "Are you sure that input information is corrected ?"
+    );
     if (!action) return alert("You don't save this property!");
     insertProperty(propertyObj).then(() => {
       present("Insert customer successfully!", 3000);
@@ -71,15 +75,16 @@ const Home: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonTitle>Add property</IonTitle>
+        <IonToolbar class="toolBar">
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/allProperty" />
+          </IonButtons>
+          <IonTitle class="tiltle">Add property</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Add property</IonTitle>
-          </IonToolbar>
+          <IonToolbar></IonToolbar>
         </IonHeader>
         <IonItem>
           <IonLabel position="stacked">
@@ -142,9 +147,9 @@ const Home: React.FC = () => {
             type="text"
             onIonChange={(event) => setReporter(event.detail.value!)}
           ></IonInput>
-          {check && reporter.length == 0 && 
+          {check && reporter.length == 0 && (
             <p>Name of reporter is required!</p>
-          }
+          )}
         </IonItem>
         <IonButton onClick={saveToDb} expand="block" color="tertiary">
           <IonLabel>Save</IonLabel>
