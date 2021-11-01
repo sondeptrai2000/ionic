@@ -19,13 +19,13 @@ import {
 } from "@ionic/react";
 import { addCircle } from "ionicons/icons";
 import { useEffect, useState } from "react";
-import { getAllPropertys } from "../databasehandler";
+import { getAllPropertys } from "../databaseFunctions";
 import { Property } from "../models";
 import "./allProperty.css";
 const AllProperty: React.FC = () => {
   //list of customers-> will be used in the List component
   const [propertysFilter, setPropertysFilter] = useState<Property[]>([]);
-  const [searchProperty, setSearchProperty] = useState("");
+  const [searchProperty, setSearchProperty] = useState("All properties");
   async function fetchData() {
     let allCustomers = await getAllPropertys();
     if (searchProperty != "All properties" && searchProperty) {
@@ -36,24 +36,16 @@ const AllProperty: React.FC = () => {
     }
     setPropertysFilter(allCustomers);
   }
-  //it will run at least once every time the page is rendered
-  useEffect(() => {
-    setSearchProperty("All properties");
-  }, []);
 
   //it will run at least once every time the page is rendered
   useEffect(() => {
     fetchData();
   }, [searchProperty]);
 
-  //it helps to refresh the home when you navigate between pages
-  // useIonViewWillEnter(() => {
-  //   fetchData();
-  // });
   async function refreshTheData(event: any) {
-    await fetchData(); //to update customer list again
+    await fetchData(); //get the newest data from DB
     setTimeout(() => {
-      //pause some time to show the effect: refreshing
+      //wait for system get data from DB
       event.detail.complete(); //done the refreshing=>effect will disapear
       console.log("Refresh completed!");
     }, 1000); //1 second to show refresh icon
@@ -68,12 +60,15 @@ const AllProperty: React.FC = () => {
             value={searchProperty}
             onIonChange={(e) => setSearchProperty(e.detail.value)}
           >
-            <IonSelectOption value="All properties">
-              All properties
-            </IonSelectOption>
+            <IonSelectOption value="All properties">All properties</IonSelectOption>
             <IonSelectOption value="Flat">Flat</IonSelectOption>
             <IonSelectOption value="House">House</IonSelectOption>
             <IonSelectOption value="Bungalow">Bungalow</IonSelectOption>
+            <IonSelectOption value="Apartment">Apartment</IonSelectOption>
+            <IonSelectOption value="Cabin">Cabin</IonSelectOption>
+            <IonSelectOption value="Castle">Castle</IonSelectOption>
+            <IonSelectOption value="Chalet">Chalet</IonSelectOption>
+            <IonSelectOption value="Single Family Detached House">Single Family Detached House</IonSelectOption>
           </IonSelect>
           <a href="/home">
             <IonIcon class="iconAdd" icon={addCircle} color="primary" />

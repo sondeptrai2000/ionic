@@ -9,26 +9,20 @@ import {
   IonItem,
   IonLabel,
   IonPage,
-  IonRefresher,
-  IonRefresherContent,
   IonSelect,
   IonSelectOption,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   IonTitle,
   IonToolbar,
   useIonViewWillEnter,
 } from "@ionic/react";
-import { addCircle, call, person } from "ionicons/icons";
-import { useEffect, useState } from "react";
+import { addCircle } from "ionicons/icons";
+import { useState } from "react";
 import { useParams } from "react-router";
 import {
   getProperty,
   updateProperty,
   deleteProperty,
-} from "../databasehandler";
-import { Property } from "../models";
+} from "../databaseFunctions";
 
 interface ParamId {
   id: string;
@@ -44,7 +38,7 @@ const PropertyDetail: React.FC = () => {
   const [reporter, setReporter] = useState("");
   const [time, setTime] = useState("");
   const [check, setCheck] = useState(false);
-
+  const [checkNumber, setCheckNumber] = useState(false);
   async function fetchData() {
     let PropertyDetail = await getProperty(Number.parseInt(id));
     setProperty(PropertyDetail.property);
@@ -58,19 +52,19 @@ const PropertyDetail: React.FC = () => {
 
   async function handleDelete() {
     //call databaseHandle to delete the current customer
-    let action = window.confirm("Are you sure to delete this ");
-    if (!action) return alert("You cancelled!");
+    let action = window.confirm("Are you sure to delete this property?");
+    if (!action) return alert("Action cancelled!");
     await deleteProperty(Number.parseInt(id));
     // eslint-disable-next-line no-restricted-globals
     history.back();
   }
 
   function updateHandle() {
-    setCheck(true);
     if (property == "" || !bedrooms || !monthlyRent || reporter == "")
-      return alert("hãy nhập hết tất cả thông tin cần thiết");
-    //call databaseHandler to update the current customer
-    var propertyỌbj = {
+      return setCheck(true);
+    if (bedrooms <= 0 || monthlyRent <= 0) return setCheckNumber(true);
+    //call databaseHandler to update property information
+    var propertyObj = {
       id: Number.parseInt(id),
       property: property,
       bedrooms: bedrooms,
@@ -80,25 +74,15 @@ const PropertyDetail: React.FC = () => {
       reporter: reporter,
       time: new Date().toLocaleDateString("vi-VN"),
     };
-    updateProperty(propertyỌbj);
-    alert("Update done!");
+    updateProperty(propertyObj);
+    alert("Update success!");
   }
-  //it will run at least once every time the page is rendered
-  // useEffect(() => {
-  //   fetchData();
-  // }, [])
-  //it helps to refresh the home when you navigate between pages
+
+  //Refresh data when navigate between pages
   useIonViewWillEnter(() => {
     fetchData();
   });
-  async function refreshTheData(event: any) {
-    await fetchData(); //to update customer list again
-    setTimeout(() => {
-      //pause some time to show the effect: refreshing
-      event.detail.complete(); //done the refreshing=>effect will disapear
-      console.log("Refresh completed!");
-    }, 1000); //1 second to show refresh icon
-  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -110,9 +94,6 @@ const PropertyDetail: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonRefresher slot="fixed" onIonRefresh={refreshTheData}>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
         <IonItem>
           <IonLabel position="stacked">
             Property type <IonIcon icon={addCircle} color="danger" />
@@ -124,6 +105,13 @@ const PropertyDetail: React.FC = () => {
             <IonSelectOption value="Flat">Flat</IonSelectOption>
             <IonSelectOption value="House">House</IonSelectOption>
             <IonSelectOption value="Bungalow">Bungalow</IonSelectOption>
+            <IonSelectOption value="Apartment">Apartment</IonSelectOption>
+            <IonSelectOption value="Cabin">Cabin</IonSelectOption>
+            <IonSelectOption value="Castle">Castle</IonSelectOption>
+            <IonSelectOption value="Chalet">Chalet</IonSelectOption>
+            <IonSelectOption value="Single Family Detached House">
+              Single Family Detached House
+            </IonSelectOption>
           </IonSelect>
           {check && property.length == 0 && <p>Property type is required!</p>}
         </IonItem>
@@ -138,6 +126,10 @@ const PropertyDetail: React.FC = () => {
             placeholder="Enter Number of bedrooms"
             onIonChange={(e) => setBedrooms(parseInt(e.detail.value!, 10))}
           ></IonInput>
+          {check && !bedrooms && <p>Number of bedroom is required!</p>}
+          {checkNumber && bedrooms && bedrooms <= 0 && (
+            <p>Number of bedroom is positive number!</p>
+          )}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">
@@ -150,7 +142,10 @@ const PropertyDetail: React.FC = () => {
             placeholder="Enter monthly rent price"
             onIonChange={(e) => setMonthlyRent(parseInt(e.detail.value!, 10))}
           ></IonInput>
-          {check && property.length == 0 && <p>Monthly rent is required!</p>}
+          {check && !monthlyRent && <p>Monthly rent is required!</p>}
+          {checkNumber && monthlyRent && monthlyRent <= 0 && (
+            <p>Monthly rent must be greate than 0!</p>
+          )}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Furniture types:</IonLabel>
@@ -186,6 +181,17 @@ const PropertyDetail: React.FC = () => {
           {check && reporter.length == 0 && (
             <p>Name of reporter is required!</p>
           )}
+        </IonItem>
+        <IonItem>
+          <IonLabel position="stacked">
+            Time added:
+            <IonIcon icon={addCircle} color="danger" />
+          </IonLabel>
+          <IonInput
+            value={time}
+            type="text"
+            readonly
+          ></IonInput>
         </IonItem>
         <IonButton onClick={updateHandle} expand="block" color="primary">
           Update

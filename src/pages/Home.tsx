@@ -11,25 +11,14 @@ import {
   IonPage,
   IonSelect,
   IonSelectOption,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
   IonTitle,
-  IonToast,
   IonToolbar,
   useIonToast,
 } from "@ionic/react";
 import { useState } from "react";
 import "./Home.css";
-import {
-  addCircle,
-  call,
-  person,
-  personCircle,
-  shareSocialSharp,
-} from "ionicons/icons";
-import { insertProperty } from "../databasehandler";
-import { start } from "repl";
+import { addCircle } from "ionicons/icons";
+import { insertProperty } from "../databaseFunctions";
 
 const Home: React.FC = () => {
   const [property, setProperty] = useState("");
@@ -40,21 +29,13 @@ const Home: React.FC = () => {
   const [reporter, setReporter] = useState("");
   const [present, dismiss] = useIonToast();
   const [check, setCheck] = useState(false);
-
-  // function checkBedRoom(){
-  //   if(bedrooms) return true;
-  //   if(!bedrooms) return false;
-  // }
-
-  function handleVibration() {
-    //vibrating for 2 seconds
-    navigator.vibrate(2000);
-    console.log("vibration for 2 seconds");
-  }
+  const [checkNumber, setCheckNumber] = useState(false);
 
   function saveToDb() {
     if (property == "" || !bedrooms || !monthlyRent || reporter == "")
       return setCheck(true);
+    if (parseInt(bedrooms) <= 0 || parseInt(monthlyRent) <= 0)
+      return setCheckNumber(true);
     var propertyObj = {
       property: property,
       bedrooms: parseInt(bedrooms),
@@ -67,9 +48,9 @@ const Home: React.FC = () => {
     let action = window.confirm(
       "Are you sure that input information is corrected ?"
     );
-    if (!action) return alert("You don't save this property!");
+    if (!action) return alert("This information has not been saved!");
     insertProperty(propertyObj).then(() => {
-      present("Insert customer successfully!", 3000);
+      present("Insert property successfully!", 3000);
     });
   }
   return (
@@ -94,6 +75,13 @@ const Home: React.FC = () => {
             <IonSelectOption value="Flat">Flat</IonSelectOption>
             <IonSelectOption value="House">House</IonSelectOption>
             <IonSelectOption value="Bungalow">Bungalow</IonSelectOption>
+            <IonSelectOption value="Apartment">Apartment</IonSelectOption>
+            <IonSelectOption value="Cabin">Cabin</IonSelectOption>
+            <IonSelectOption value="Castle">Castle</IonSelectOption>
+            <IonSelectOption value="Chalet">Chalet</IonSelectOption>
+            <IonSelectOption value="Single Family Detached House">
+              Single Family Detached House
+            </IonSelectOption>
           </IonSelect>
           {check && property.length == 0 && <p>Property type is required!</p>}
         </IonItem>
@@ -107,10 +95,11 @@ const Home: React.FC = () => {
             onIonChange={(e) => setBedrooms(e.detail.value!)}
           ></IonInput>
           {check && !bedrooms && <p>Number of bedroom is required!</p>}
+          {checkNumber && parseInt(bedrooms) <= 0 && <p>Number of bedroom is positive number!</p>}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">
-            Monthly rent price: <IonIcon icon={addCircle} color="danger" />
+            Monthly rent price: (Unit:$) <IonIcon icon={addCircle} color="danger" />
           </IonLabel>
           <IonInput
             type="number"
@@ -118,6 +107,7 @@ const Home: React.FC = () => {
             onIonChange={(e) => setMonthlyRent(e.detail.value!)}
           ></IonInput>
           {check && !monthlyRent && <p>Monthly rent is required!</p>}
+          {checkNumber && parseInt(monthlyRent) <= 0 && <p>Monthly rent must be greate than 0!</p>}
         </IonItem>
         <IonItem>
           <IonLabel position="stacked">Furniture types:</IonLabel>
